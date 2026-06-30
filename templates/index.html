@@ -7,23 +7,100 @@
 </head>
 <body>
 <div id="homePage">
-    <h1>Welcome to Crosspost</h1>
-    <p>A platform to post videos across multiple streaming applications simultaneously. Key features include:</p>
-    <ul>
-        <li>Post videos with previews on YouTube and other platforms</li>
-        <li>Efficient crossposting tool</li>
-        <li>Two more key points</li>
+    <p class="eyebrow">Video Distribution Platform</p>
+    <h1>The Fastest Way To Crosspost Video Content</h1>
+    <p class="intro">
+        Crosspost helps creators, agencies, and media teams publish once and distribute everywhere
+        with cleaner workflows, fewer errors, and consistent performance across channels.
+    </p>
+
+    <ul class="trust-strip">
+        <li><strong>3x faster</strong> average publishing workflow</li>
+        <li><strong>One dashboard</strong> for all connected platforms</li>
+        <li><strong>Consistent branding</strong> across every upload</li>
     </ul>
+
+    <div class="home-actions">
+        <button type="button" class="btn btn-primary" onclick="showSignupPage()">Create Account</button>
+        <button type="button" class="btn btn-secondary" onclick="showLoginPage()">Log In</button>
+    </div>
+
+    <section class="benefits-section">
+        <h2>Why Teams Choose Crosspost Over Other Tools</h2>
+        <div class="benefits-grid">
+            <article class="benefit-item">
+                <h3>Single Upload Workflow</h3>
+                <p>Stop re-uploading the same file to each platform and repeating the same checks.</p>
+            </article>
+            <article class="benefit-item">
+                <h3>Metadata That Stays Aligned</h3>
+                <p>Titles, descriptions, and tags stay consistent so campaigns ship exactly as planned.</p>
+            </article>
+            <article class="benefit-item">
+                <h3>Fewer Publishing Mistakes</h3>
+                <p>Centralized controls reduce forgotten posts, mismatched copies, and duplicate edits.</p>
+            </article>
+            <article class="benefit-item">
+                <h3>Built For Speed</h3>
+                <p>Batch-ready workflows help you turn around weekly content calendars in less time.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="comparison-section">
+        <h2>What Makes Crosspost Better Than Other Crossposting Sites</h2>
+        <div class="comparison-grid">
+            <div class="comparison-head">Common Issue Elsewhere</div>
+            <div class="comparison-head">Crosspost Advantage</div>
+
+            <div class="comparison-cell">Manual copy/paste between multiple upload forms</div>
+            <div class="comparison-cell">One publish flow with reusable content fields</div>
+
+            <div class="comparison-cell">Inconsistent thumbnails, titles, and tags by channel</div>
+            <div class="comparison-cell">Centralized metadata controls for consistent branding</div>
+
+            <div class="comparison-cell">Scattered status visibility across tools</div>
+            <div class="comparison-cell">Clear, unified dashboard for execution tracking</div>
+
+            <div class="comparison-cell">Slow, repetitive publishing for growing teams</div>
+            <div class="comparison-cell">Faster turnaround designed for high-volume posting</div>
+        </div>
+    </section>
 </div>
 <div id="signupPage" style="display: none;">
+    <h2>Create Your Crosspost Account</h2>
+    <p>Set up your account to start publishing across channels from one dashboard.</p>
+    <button type="button" class="btn btn-secondary" onclick="showHomePage()">Back to Home</button>
     <div class="error">
 
     </div>
 </div>
 <div id="loginPage" style="display: none;">
+    <h2>Welcome Back</h2>
+    <p>Log in to manage scheduled and published content in one place.</p>
+    <button type="button" class="btn btn-secondary" onclick="showHomePage()">Back to Home</button>
     <div class="error">
 
     </div>
 </div>
+<script>
+    function showHomePage() {
+        document.getElementById("homePage").style.display = "block";
+        document.getElementById("signupPage").style.display = "none";
+        document.getElementById("loginPage").style.display = "none";
+    }
+
+    function showSignupPage() {
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("signupPage").style.display = "block";
+    }
+
+    function showLoginPage() {
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("signupPage").style.display = "none";
+        document.getElementById("loginPage").style.display = "block";
+    }
+</script>
 </body>
 </html>
