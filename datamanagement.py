@@ -14,6 +14,7 @@ def create_database():
     conn.commit()
     conn.close()
 
+
 def login(username, password):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
@@ -22,7 +23,11 @@ def login(username, password):
     ''', (username, password))
     user = cursor.fetchone()
     conn.close()
-    return user
+    if user:
+        return user
+    else:
+        return False
+
 
 def signup(username, password):
     conn = sqlite3.connect('user_data.db')
@@ -32,3 +37,20 @@ def signup(username, password):
     ''', (username, password))
     conn.commit()
     conn.close()
+
+
+def check_username_exists(username):
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT * FROM users WHERE username = ?
+    ''', (username,))
+    user = cursor.fetchone()
+    conn.close()
+    if user:
+        return True
+    else:
+        return False
+
+
+create_database()
