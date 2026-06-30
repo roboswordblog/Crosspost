@@ -20,6 +20,36 @@
         <li><strong>Consistent branding</strong> across every upload</li>
     </ul>
 
+    <section class="value-estimator" aria-label="Time saved calculator">
+        <h2>See Your Weekly Time Savings</h2>
+        <p>Move the slider to estimate how much publishing time Crosspost can save your team each week.</p>
+        <div class="estimator-controls">
+            <label for="videosPerWeek">
+                Videos posted per week:
+                <strong id="videosPerWeekValue">10</strong>
+            </label>
+            <input
+                id="videosPerWeek"
+                type="range"
+                min="2"
+                max="60"
+                step="1"
+                value="10"
+                oninput="updateValueEstimator(this.value)"
+            >
+        </div>
+        <div class="estimator-results">
+            <div class="metric">
+                <span class="metric-label">Estimated time saved</span>
+                <strong id="hoursSaved">2.5 hours/week</strong>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Estimated manual steps removed</span>
+                <strong id="stepsSaved">80 actions/week</strong>
+            </div>
+        </div>
+    </section>
+
     <div class="home-actions">
         <button type="button" class="btn btn-primary" onclick="showSignupPage()">Create Account</button>
         <button type="button" class="btn btn-secondary" onclick="showLoginPage()">Log In</button>
@@ -84,6 +114,18 @@
     </div>
 </div>
 <script>
+    function updateValueEstimator(videosPerWeek) {
+        const videos = Number(videosPerWeek);
+        const hoursSaved = (videos * 0.25).toFixed(1);
+        const stepsSaved = videos * 8;
+
+        document.getElementById("videosPerWeekValue").textContent = videos.toString();
+        document.getElementById("hoursSaved").textContent = hoursSaved + " hours/week";
+        document.getElementById("stepsSaved").textContent = stepsSaved + " actions/week";
+    }
+
+    updateValueEstimator(10);
+
     function showHomePage() {
         document.getElementById("homePage").style.display = "block";
         document.getElementById("signupPage").style.display = "none";
