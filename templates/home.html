@@ -7,55 +7,125 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/home.css') }}">
 </head>
 <body>
-<div id="Posts">
 <div class="app-shell">
     <aside class="sidebar" aria-label="Primary">
         <h2 class="brand">Crosspost</h2>
         <nav class="sidebar-nav">
-            <button type="button" class="nav-item nav-item-active">Posts</button>
-            <button type="button" class="nav-item">Analytics</button>
-            <button type="button" class="nav-item">Payments</button>
+            <button type="button" id="postsNavButton" class="nav-item nav-item-active">Posts</button>
+            <button type="button" class="nav-item is-hidden" hidden>Analytics</button>
+            <button type="button" id="paymentsNavButton" class="nav-item">Payments</button>
         </nav>
     </aside>
 
     <main class="main-content">
-        <header class="topbar">
-            <div>
-                <p class="eyebrow">Dashboard</p>
-                <h1>What will you post today?</h1>
-            </div>
-            <button type="button" class="btn btn-primary">Publish New Video</button>
-        </header>
-        <section class="metrics-grid">
-            <article class="metric-card">
-                <p class="metric-label">Posts This Week</p>
-                <strong>12</strong>
-            </article>
-            <article class="metric-card">
-                <p class="metric-label">Posts All Time</p>
-                <strong>Posts </strong>
-            </article>
+        <section id="postsSection">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Dashboard</p>
+                    <h1>What will you post today?</h1>
+                </div>
+                <button type="button" class="btn btn-primary">Publish New Video</button>
+            </header>
+            <section class="metrics-grid">
+                <article class="metric-card">
+                    <p class="metric-label">Posts This Week</p>
+                    <strong>12</strong>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Posts All Time</p>
+                    <strong>184</strong>
+                </article>
 
+            </section>
+            <br>
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Recent Posts</h2>
+                    <input id="search" type="search" placeholder="Search your recent publishing" aria-label="Search recent posts">
+                </div>
+                <ul class="recent-list">
+                </ul>
+            </section>
         </section>
-        <br>
-        <section class="panel">
-            <div class="panel-header">
-                <h2>Recent Posts</h2>
-                <input id="search" type="search" placeholder="Search your recent publishing" aria-label="Search recent posts">
-            </div>
-            <ul class="recent-list">
-            </ul>
+        <section id="paymentsSection" class="is-hidden">
+            <section class="panel plan-panel">
+                <h2>Payments & Plan Tier</h2>
+                <p class="plan-intro">Default plan is set to Free. Upgrade to Paid for broader publishing limits.</p>
+
+                <div class="tier-controls">
+                    <label class="tier-option tier-option-active" for="tierFree">
+                        <input id="tierFree" type="radio" name="planTier" value="free" checked>
+                        <span>Free Tier</span>
+                    </label>
+                    <label class="tier-option" for="tierPaid">
+                        <input id="tierPaid" type="radio" name="planTier" value="paid">
+                        <span>Paid Tier</span>
+                    </label>
+                </div>
+
+                <div class="tier-grid">
+                    <article class="tier-card">
+                        <h3>Free Tier Includes</h3>
+                        <ul>
+                            <li>Up to 2 videos per day</li>
+                            <li>Basic post scheduling</li>
+                            <li>Core platform support</li>
+                            <li>Standard queue management</li>
+                        </ul>
+                    </article>
+                    <article class="tier-card tier-card-paid">
+                        <h3>Paid Tier Adds</h3>
+                        <ul>
+                            <li>More connected platforms</li>
+                            <li>More than 2 videos per day</li>
+                            <li>Priority publishing queue</li>
+                            <li>Advanced analytics and reporting</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
         </section>
-
-
     </main>
 </div>
-</div>
-<div id="Analytics">
+<script>
+    const postsNavButton = document.getElementById("postsNavButton");
+    const paymentsNavButton = document.getElementById("paymentsNavButton");
+    const postsSection = document.getElementById("postsSection");
+    const paymentsSection = document.getElementById("paymentsSection");
 
-</div>
-<div id="Payments">
+    const tierFree = document.getElementById("tierFree");
+    const tierPaid = document.getElementById("tierPaid");
+    const tierOptions = document.querySelectorAll(".tier-option");
 
-</div>
+    function showPostsSection() {
+        postsSection.classList.remove("is-hidden");
+        paymentsSection.classList.add("is-hidden");
+        postsNavButton.classList.add("nav-item-active");
+        paymentsNavButton.classList.remove("nav-item-active");
+    }
+
+    function showPaymentsSection() {
+        postsSection.classList.add("is-hidden");
+        paymentsSection.classList.remove("is-hidden");
+        postsNavButton.classList.remove("nav-item-active");
+        paymentsNavButton.classList.add("nav-item-active");
+    }
+
+    function updateTierSelection() {
+        tierOptions.forEach((option) => option.classList.remove("tier-option-active"));
+        if (tierFree.checked) {
+            tierFree.closest(".tier-option").classList.add("tier-option-active");
+        } else if (tierPaid.checked) {
+            tierPaid.closest(".tier-option").classList.add("tier-option-active");
+        }
+    }
+
+    postsNavButton.addEventListener("click", showPostsSection);
+    paymentsNavButton.addEventListener("click", showPaymentsSection);
+    tierFree.addEventListener("change", updateTierSelection);
+    tierPaid.addEventListener("change", updateTierSelection);
+    showPostsSection();
+    updateTierSelection();
+</script>
 </body>
 </html>
