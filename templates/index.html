@@ -100,10 +100,21 @@
 <div id="signupPage" style="display: none;">
     <h2>Create Your Crosspost Account</h2>
     <p>Set up your account to start publishing across channels from one dashboard.</p>
-    <button type="button" class="btn btn-secondary" onclick="showHomePage()">Back to Home</button>
-    <div class="error">
+    <form id="signupForm" class="auth-form">
+        <label for="signupUsername">Username</label>
+        <input id="signupUsername" name="username" type="text" autocomplete="username" required>
 
-    </div>
+        <label for="signupPassword">Password</label>
+        <input id="signupPassword" name="password" type="password" autocomplete="new-password" required>
+
+        <label for="signupGmail">Gmail</label>
+        <input id="signupGmail" name="gmail" type="email" autocomplete="email" placeholder="you@gmail.com" required>
+
+        <button type="submit" id="signupSubmit" class="btn btn-primary">Sign Up</button>
+    </form>
+    <div id="signupError" class="error"></div>
+    <div id="signupSuccess" class="success"></div>
+    <button type="button" class="btn btn-secondary" onclick="showHomePage()">Back to Home</button>
 </div>
 <div id="loginPage" style="display: none;">
     <h2>Welcome Back</h2>
@@ -114,6 +125,60 @@
     </div>
 </div>
 <script>
+    let usernamePollTimer = null;
+
+    function clearSignupMessages() {
+        document.getElementById("signupError").textContent = "";
+        document.getElementById("signupSuccess").textContent = "";
+    }
+
+    async function pollUsernameExists() {
+        const usernameInput = document.getElementById("signupUsername");
+        const errorEl = document.getElementById("signupError");
+        const submitButton = document.getElementById("signupSubmit");
+        const username = usernameInput.value.trim();
+
+        if (!username) {
+            errorEl.textContent = "";
+            submitButton.disabled = false;
+            return;
+        }
+
+        try {
+            const response = await fetch("/usernameExist", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ username }).toString()
+            });
+            const data = await response.json();
+            if (data.usernameExists) {
+                errorEl.textContent = "Username already exists. Please choose another.";
+                submitButton.disabled = true;
+            } else {
+                errorEl.textContent = "";
+                submitButton.disabled = false;
+            }
+        } catch (error) {
+            errorEl.textContent = "Unable to validate username right now.";
+            submitButton.disabled = false;
+        }
+    }
+
+    function startUsernamePolling() {
+        if (usernamePollTimer) {
+            clearInterval(usernamePollTimer);
+        }
+        pollUsernameExists();
+        usernamePollTimer = setInterval(pollUsernameExists, 1500);
+    }
+
+    function stopUsernamePolling() {
+        if (usernamePollTimer) {
+            clearInterval(usernamePollTimer);
+            usernamePollTimer = null;
+        }
+    }
+
     function updateValueEstimator(videosPerWeek) {
         const videos = Number(videosPerWeek);
         const hoursSaved = (videos * 0.25).toFixed(1);
@@ -127,6 +192,7 @@
     updateValueEstimator(10);
 
     function showHomePage() {
+        stopUsernamePolling();
         document.getElementById("homePage").style.display = "block";
         document.getElementById("signupPage").style.display = "none";
         document.getElementById("loginPage").style.display = "none";
@@ -136,13 +202,49 @@
         document.getElementById("homePage").style.display = "none";
         document.getElementById("loginPage").style.display = "none";
         document.getElementById("signupPage").style.display = "block";
+        clearSignupMessages();
+        startUsernamePolling();
     }
 
     function showLoginPage() {
+        stopUsernamePolling();
         document.getElementById("homePage").style.display = "none";
         document.getElementById("signupPage").style.display = "none";
         document.getElementById("loginPage").style.display = "block";
     }
+
+    document.getElementById("signupUsername").addEventListener("input", pollUsernameExists);
+
+    document.getElementById("signupForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearSignupMessages();
+        await pollUsernameExists();
+        if (document.getElementById("signupSubmit").disabled) {
+            return;
+        }
+
+        const username = document.getElementById("signupUsername").value.trim();
+        const password = document.getElementById("signupPassword").value.trim();
+        const gmail = document.getElementById("signupGmail").value.trim();
+        const formData = new URLSearchParams({ username, password, gmail });
+
+        try {
+            const response = await fetch("/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData.toString()
+            });
+            const data = await response.json();
+            if (!response.ok || !data.ok) {
+                document.getElementById("signupError").textContent = data.error || "Signup failed.";
+                return;
+            }
+            document.getElementById("signupSuccess").textContent = data.message || "Signup successful.";
+            document.getElementById("signupForm").reset();
+        } catch (error) {
+            document.getElementById("signupError").textContent = "Could not reach the server.";
+        }
+    });
 </script>
 </body>
 </html>

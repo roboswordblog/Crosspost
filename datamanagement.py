@@ -8,9 +8,15 @@ def create_database():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            gmail TEXT
         )
     ''')
+    # Backfill older databases created before gmail was added.
+    cursor.execute("PRAGMA table_info(users)")
+    columns = {col[1] for col in cursor.fetchall()}
+    if "gmail" not in columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN gmail TEXT")
     conn.commit()
     conn.close()
 
@@ -29,12 +35,12 @@ def login(username, password):
         return False
 
 
-def signup(username, password):
+def signup(username, password, gmail=None):
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO users (username, password) VALUES (?, ?)
-    ''', (username, password))
+        INSERT INTO users (username, password, gmail) VALUES (?, ?, ?)
+    ''', (username, password, gmail))
     conn.commit()
     conn.close()
 
