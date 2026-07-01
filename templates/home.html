@@ -2,9 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Crosspost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/home.css') }}">
 </head>
 <body>
+<div id="Posts">
+<div class="app-shell">
+    <aside class="sidebar" aria-label="Primary">
+        <h2 class="brand">Crosspost</h2>
+        <nav class="sidebar-nav">
+            <button type="button" class="nav-item nav-item-active">Posts</button>
+            <button type="button" class="nav-item">Analytics</button>
+            <button type="button" class="nav-item">Payments</button>
+        </nav>
+    </aside>
 
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Dashboard</p>
+                <h1>What will you post today?</h1>
+            </div>
+            <button type="button" class="btn btn-primary">Publish New Video</button>
+        </header>
+        <section class="metrics-grid">
+            <article class="metric-card">
+                <p class="metric-label">Posts This Week</p>
+                <strong>12</strong>
+            </article>
+            <article class="metric-card">
+                <p class="metric-label">Posts All Time</p>
+                <strong>Posts </strong>
+            </article>
+
+        </section>
+        <br>
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Recent Posts</h2>
+                <input id="search" type="search" placeholder="Search your recent publishing" aria-label="Search recent posts">
+            </div>
+            <ul class="recent-list">
+            </ul>
+        </section>
+
+
+    </main>
+</div>
+</div>
+<div id="Analytics">
+
+</div>
+<div id="Payments">
+
+</div>
 </body>
 </html>

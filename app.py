@@ -41,5 +41,9 @@ def signup_route():
     db_signup(username, password)
     return jsonify({"ok": True, "message": "Signup complete."})
 
+@app.route("/home", methods=["POST", "GET"])
+def home():
+    return render_template("home.html")
+
 if __name__ == "__main__":
     app.run(debug=True)

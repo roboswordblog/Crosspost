@@ -112,17 +112,26 @@
     </form>
     <div id="signupError" class="error"></div>
     <div id="signupSuccess" class="success"></div>
+    <button type="button" id="signupHomeButton" class="btn btn-primary auth-home-btn" onclick="goToHomeRoute()" disabled>Go to Home</button>
     <button type="button" class="btn btn-secondary" onclick="showHomePage()">Back to Home</button>
 </div>
 <div id="loginPage" style="display: none;">
     <h2>Welcome Back</h2>
     <p>Log in to manage scheduled and published content in one place.</p>
-    <form action="/home" method="get">
-    <button type="button" class="btn btn-secondary">Signup</button>
-    </form>
-        <div class="error">
+    <form id="loginForm" class="auth-form">
+        <label for="loginUsername">Username</label>
+        <input id="loginUsername" name="username" type="text" autocomplete="username" required>
 
-    </div>
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+
+        <button type="submit" class="btn btn-primary">Log In</button>
+    </form>
+    <div id="loginError" class="error"></div>
+    <div id="loginSuccess" class="success"></div>
+    <button type="button" id="loginHomeButton" class="btn btn-primary auth-home-btn" onclick="goToHomeRoute()" disabled>Go to Home</button>
+    <button type="button" class="btn btn-secondary" onclick="showSignupPage()">Create Account</button>
+    <button type="button" class="btn btn-secondary" onclick="showHomePage()">Back to Home</button>
 </div>
 <script>
     let usernamePollTimer = null;
@@ -130,6 +139,17 @@
     function clearSignupMessages() {
         document.getElementById("signupError").textContent = "";
         document.getElementById("signupSuccess").textContent = "";
+        document.getElementById("signupHomeButton").disabled = true;
+    }
+
+    function clearLoginMessages() {
+        document.getElementById("loginError").textContent = "";
+        document.getElementById("loginSuccess").textContent = "";
+        document.getElementById("loginHomeButton").disabled = true;
+    }
+
+    function goToHomeRoute() {
+        window.location.href = "/home";
     }
 
     async function pollUsernameExists() {
@@ -193,6 +213,7 @@
 
     function showHomePage() {
         stopUsernamePolling();
+        clearLoginMessages();
         document.getElementById("homePage").style.display = "block";
         document.getElementById("signupPage").style.display = "none";
         document.getElementById("loginPage").style.display = "none";
@@ -203,6 +224,7 @@
         document.getElementById("loginPage").style.display = "none";
         document.getElementById("signupPage").style.display = "block";
         clearSignupMessages();
+        clearLoginMessages();
         startUsernamePolling();
     }
 
@@ -211,6 +233,8 @@
         document.getElementById("homePage").style.display = "none";
         document.getElementById("signupPage").style.display = "none";
         document.getElementById("loginPage").style.display = "block";
+        clearSignupMessages();
+        clearLoginMessages();
     }
 
     document.getElementById("signupUsername").addEventListener("input", pollUsernameExists);
@@ -239,9 +263,40 @@
                 return;
             }
             document.getElementById("signupSuccess").textContent = data.message || "Signup successful.";
+            document.getElementById("signupHomeButton").disabled = false;
             document.getElementById("signupForm").reset();
+            goToHomeRoute();
         } catch (error) {
             document.getElementById("signupError").textContent = "Could not reach the server.";
+        }
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearLoginMessages();
+
+        const username = document.getElementById("loginUsername").value.trim();
+        const password = document.getElementById("loginPassword").value.trim();
+        const formData = new URLSearchParams({ username, password });
+
+        try {
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData.toString()
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                document.getElementById("loginError").textContent = data.error || "Login failed.";
+                return;
+            }
+
+            document.getElementById("loginSuccess").textContent = data.message || "Login successful.";
+            document.getElementById("loginHomeButton").disabled = false;
+            goToHomeRoute();
+        } catch (error) {
+            document.getElementById("loginError").textContent = "Could not reach the server.";
         }
     });
 </script>
