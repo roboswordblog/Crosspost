@@ -31,18 +31,14 @@ def username_exist_route():
 def signup_route():
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "").strip()
-    gmail = request.form.get("gmail", "").strip()
 
-    if not username or not password or not gmail:
+    if not username or not password:
         return jsonify({"ok": False, "error": "Username, password, and Gmail are required."}), 400
-
-    if not gmail.endswith("@gmail.com"):
-        return jsonify({"ok": False, "error": "Please enter a valid Gmail address."}), 400
 
     if check_username_exists(username):
         return jsonify({"ok": False, "error": "That username already exists."}), 409
 
-    db_signup(username, password, gmail)
+    db_signup(username, password)
     return jsonify({"ok": True, "message": "Signup complete."})
 
 if __name__ == "__main__":

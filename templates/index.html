@@ -107,8 +107,6 @@
         <label for="signupPassword">Password</label>
         <input id="signupPassword" name="password" type="password" autocomplete="new-password" required>
 
-        <label for="signupGmail">Gmail</label>
-        <input id="signupGmail" name="gmail" type="email" autocomplete="email" placeholder="you@gmail.com" required>
 
         <button type="submit" id="signupSubmit" class="btn btn-primary">Sign Up</button>
     </form>
@@ -119,8 +117,10 @@
 <div id="loginPage" style="display: none;">
     <h2>Welcome Back</h2>
     <p>Log in to manage scheduled and published content in one place.</p>
-    <button type="button" class="btn btn-secondary" onclick="showHomePage()">Back to Home</button>
-    <div class="error">
+    <form action="/home" method="get">
+    <button type="button" class="btn btn-secondary">Signup</button>
+    </form>
+        <div class="error">
 
     </div>
 </div>
@@ -225,8 +225,7 @@
 
         const username = document.getElementById("signupUsername").value.trim();
         const password = document.getElementById("signupPassword").value.trim();
-        const gmail = document.getElementById("signupGmail").value.trim();
-        const formData = new URLSearchParams({ username, password, gmail });
+        const formData = new URLSearchParams({ username, password});
 
         try {
             const response = await fetch("/signup", {
