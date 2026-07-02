@@ -12,7 +12,7 @@
         <h2 class="brand">Crosspost</h2>
         <nav class="sidebar-nav">
             <button type="button" id="postsNavButton" class="nav-item nav-item-active">Posts</button>
-            <button type="button" class="nav-item is-hidden" hidden>Analytics</button>
+            <button type="button" id="analyticsNavButton" class="nav-item">Analytics</button>
             <button type="button" id="paymentsNavButton" class="nav-item">Payments</button>
         </nav>
     </aside>
@@ -45,6 +45,68 @@
                 </div>
                 <ul class="recent-list">
                 </ul>
+            </section>
+        </section>
+        <section id="analyticsSection" class="is-hidden">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Newest Video Performance</h2>
+                    <span class="panel-chip">Last 24 Hours</span>
+                </div>
+                <article class="latest-video">
+                    <div>
+                        <p class="metric-label">Video</p>
+                        <h3>Founder Q&A Clip</h3>
+                        <p class="analytics-subtitle">Published on YouTube and TikTok</p>
+                    </div>
+                    <div class="latest-metrics">
+                        <article class="metric-card">
+                            <p class="metric-label">Views</p>
+                            <strong>24.8K</strong>
+                        </article>
+                        <article class="metric-card">
+                            <p class="metric-label">Engagement Rate</p>
+                            <strong>8.3%</strong>
+                        </article>
+                        <article class="metric-card">
+                            <p class="metric-label">Watch Time</p>
+                            <strong>39.4h</strong>
+                        </article>
+                    </div>
+                </article>
+            </section>
+
+            <section class="panel analytics-overview">
+                <div class="panel-header">
+                    <h2>Overall Platform Analytics</h2>
+                    <span class="panel-chip">Last 30 Days</span>
+                </div>
+                <div class="platform-grid">
+                    <article class="platform-card">
+                        <h3>YouTube</h3>
+                        <p class="analytics-subtitle">12 videos published</p>
+                        <ul class="platform-stats">
+                            <li><span>Total Views</span><strong>148K</strong></li>
+                            <li><span>Avg. Engagement</span><strong>7.9%</strong></li>
+                            <li><span>Subscribers Gained</span><strong>+840</strong></li>
+                        </ul>
+                        <div class="progress-track" aria-label="YouTube growth score">
+                            <div class="progress-fill progress-youtube"></div>
+                        </div>
+                    </article>
+                    <article class="platform-card">
+                        <h3>TikTok</h3>
+                        <p class="analytics-subtitle">16 videos published</p>
+                        <ul class="platform-stats">
+                            <li><span>Total Views</span><strong>221K</strong></li>
+                            <li><span>Avg. Engagement</span><strong>10.6%</strong></li>
+                            <li><span>Followers Gained</span><strong>+1,420</strong></li>
+                        </ul>
+                        <div class="progress-track" aria-label="TikTok growth score">
+                            <div class="progress-fill progress-tiktok"></div>
+                        </div>
+                    </article>
+                </div>
             </section>
         </section>
         <section id="paymentsSection" class="is-hidden">
@@ -90,8 +152,10 @@
 </div>
 <script>
     const postsNavButton = document.getElementById("postsNavButton");
+    const analyticsNavButton = document.getElementById("analyticsNavButton");
     const paymentsNavButton = document.getElementById("paymentsNavButton");
     const postsSection = document.getElementById("postsSection");
+    const analyticsSection = document.getElementById("analyticsSection");
     const paymentsSection = document.getElementById("paymentsSection");
 
     const tierFree = document.getElementById("tierFree");
@@ -100,15 +164,28 @@
 
     function showPostsSection() {
         postsSection.classList.remove("is-hidden");
+        analyticsSection.classList.add("is-hidden");
         paymentsSection.classList.add("is-hidden");
         postsNavButton.classList.add("nav-item-active");
+        analyticsNavButton.classList.remove("nav-item-active");
+        paymentsNavButton.classList.remove("nav-item-active");
+    }
+
+    function showAnalyticsSection() {
+        postsSection.classList.add("is-hidden");
+        analyticsSection.classList.remove("is-hidden");
+        paymentsSection.classList.add("is-hidden");
+        postsNavButton.classList.remove("nav-item-active");
+        analyticsNavButton.classList.add("nav-item-active");
         paymentsNavButton.classList.remove("nav-item-active");
     }
 
     function showPaymentsSection() {
         postsSection.classList.add("is-hidden");
+        analyticsSection.classList.add("is-hidden");
         paymentsSection.classList.remove("is-hidden");
         postsNavButton.classList.remove("nav-item-active");
+        analyticsNavButton.classList.remove("nav-item-active");
         paymentsNavButton.classList.add("nav-item-active");
     }
 
@@ -122,6 +199,7 @@
     }
 
     postsNavButton.addEventListener("click", showPostsSection);
+    analyticsNavButton.addEventListener("click", showAnalyticsSection);
     paymentsNavButton.addEventListener("click", showPaymentsSection);
     tierFree.addEventListener("change", updateTierSelection);
     tierPaid.addEventListener("change", updateTierSelection);

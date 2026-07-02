@@ -20,6 +20,24 @@ def create_database():
     conn.commit()
     conn.close()
 
+def create_videos_database():
+    conn = sqlite3.connect('videos.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS videos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            title TEXT NOT NULL,
+            platform TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'draft',
+            views INTEGER NOT NULL DEFAULT 0,
+            likes INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
 
 def login(username, password):
     conn = sqlite3.connect('user_data.db')
@@ -60,3 +78,4 @@ def check_username_exists(username):
 
 
 create_database()
+create_videos_database()
