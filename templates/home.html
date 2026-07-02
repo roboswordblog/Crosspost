@@ -30,7 +30,7 @@
                         {% endif %}
                     </h1>
                 </div>
-                <button type="button" class="btn btn-primary">Publish New Video</button>
+                <button type="button" id="publishVideoButton" class="btn btn-primary">Publish New Video</button>
             </header>
             <section class="metrics-grid">
                 <article class="metric-card">
@@ -165,7 +165,51 @@
         </section>
     </main>
 </div>
+<div id="publishModalOverlay" class="modal-overlay is-hidden" aria-hidden="true">
+    <section class="modal-window" role="dialog" aria-modal="true" aria-labelledby="publishModalTitle">
+        <div class="modal-header">
+            <h2 id="publishModalTitle">Publish Video</h2>
+            <button type="button" id="closePublishModalButton" class="btn btn-secondary modal-close">Close</button>
+        </div>
+        <div class="modal-body">
+            <div class="upload-row">
+                <input id="videoFileInput" type="file" accept="video/*" class="is-hidden">
+                <button type="button" id="videoUploadButton" class="btn btn-primary">Upload Video</button>
+                <span id="videoFileName" class="upload-filename">No file selected</span>
+            </div>
+            <div class="platform-sliders">
+                <label class="platform-toggle" for="publishYoutube">
+                    <span>YouTube</span>
+                    <span class="switch">
+                        <input id="publishYoutube" type="checkbox" checked>
+                        <span class="switch-slider"></span>
+                    </span>
+                </label>
+                <label class="platform-toggle" for="publishTiktok">
+                    <span>TikTok</span>
+                    <span class="switch">
+                        <input id="publishTiktok" type="checkbox" checked>
+                        <span class="switch-slider"></span>
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button type="button" id="cancelPublishModalButton" class="btn btn-secondary">Cancel</button>
+            <button type="button" class="btn btn-primary">Continue</button>
+        </div>
+    </section>
+</div>
 <script>
+    const appShell = document.querySelector(".app-shell");
+    const publishVideoButton = document.getElementById("publishVideoButton");
+    const publishModalOverlay = document.getElementById("publishModalOverlay");
+    const closePublishModalButton = document.getElementById("closePublishModalButton");
+    const cancelPublishModalButton = document.getElementById("cancelPublishModalButton");
+    const videoFileInput = document.getElementById("videoFileInput");
+    const videoUploadButton = document.getElementById("videoUploadButton");
+    const videoFileName = document.getElementById("videoFileName");
+
     const postsNavButton = document.getElementById("postsNavButton");
     const analyticsNavButton = document.getElementById("analyticsNavButton");
     const paymentsNavButton = document.getElementById("paymentsNavButton");
@@ -176,6 +220,20 @@
     const tierFree = document.getElementById("tierFree");
     const tierPaid = document.getElementById("tierPaid");
     const tierOptions = document.querySelectorAll(".tier-option");
+
+    function openPublishModal() {
+        publishModalOverlay.classList.remove("is-hidden");
+        appShell.classList.add("is-blurred");
+        document.body.classList.add("modal-open");
+        publishModalOverlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closePublishModal() {
+        publishModalOverlay.classList.add("is-hidden");
+        appShell.classList.remove("is-blurred");
+        document.body.classList.remove("modal-open");
+        publishModalOverlay.setAttribute("aria-hidden", "true");
+    }
 
     function showPostsSection() {
         postsSection.classList.remove("is-hidden");
@@ -216,6 +274,29 @@
     postsNavButton.addEventListener("click", showPostsSection);
     analyticsNavButton.addEventListener("click", showAnalyticsSection);
     paymentsNavButton.addEventListener("click", showPaymentsSection);
+    publishVideoButton.addEventListener("click", openPublishModal);
+    closePublishModalButton.addEventListener("click", closePublishModal);
+    cancelPublishModalButton.addEventListener("click", closePublishModal);
+    videoUploadButton.addEventListener("click", function () {
+        videoFileInput.click();
+    });
+    videoFileInput.addEventListener("change", function () {
+        if (videoFileInput.files && videoFileInput.files.length > 0) {
+            videoFileName.textContent = videoFileInput.files[0].name;
+        } else {
+            videoFileName.textContent = "No file selected";
+        }
+    });
+    publishModalOverlay.addEventListener("click", function (event) {
+        if (event.target === publishModalOverlay) {
+            closePublishModal();
+        }
+    });
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !publishModalOverlay.classList.contains("is-hidden")) {
+            closePublishModal();
+        }
+    });
     tierFree.addEventListener("change", updateTierSelection);
     tierPaid.addEventListener("change", updateTierSelection);
     showPostsSection();
