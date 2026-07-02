@@ -2,6 +2,22 @@ import sqlite3
 import json
 
 
+def _normalize_text(value, max_length=255):
+    text = str(value or "").strip()
+    if "\x00" in text:
+        raise ValueError("Invalid text input.")
+    return text[:max_length]
+
+
+def _normalize_optional_text(value, max_length=5000):
+    if value is None:
+        return None
+    text = str(value).strip()
+    if "\x00" in text:
+        raise ValueError("Invalid text input.")
+    return text[:max_length]
+
+
 def create_database():
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
@@ -10,7 +26,8 @@ def create_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             password TEXT NOT NULL,
-            gmail TEXT
+            gmail TEXT,
+            auth_tokens TEXT
         )
     ''')
     # Backfill older databases created before gmail was added.
@@ -18,6 +35,8 @@ def create_database():
     columns = {col[1] for col in cursor.fetchall()}
     if "gmail" not in columns:
         cursor.execute("ALTER TABLE users ADD COLUMN gmail TEXT")
+    if "auth_tokens" not in columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN auth_tokens TEXT")
     conn.commit()
     conn.close()
 
@@ -62,10 +81,22 @@ def create_videos_database():
 
 def publish_video(author, title, date_published, description, platforms_posted, link,
                   user_id=None, status="published", views=0, likes=0):
+    author = _normalize_text(author, 255)
+    title = _normalize_text(title, 300)
+    date_published = _normalize_optional_text(date_published, 64)
+    description = _normalize_optional_text(description, 8000)
+    link = _normalize_optional_text(link, 1200)
+    status = _normalize_text(status, 50) or "published"
+
     if isinstance(platforms_posted, (list, tuple)):
-        platforms_list = [str(platform).strip() for platform in platforms_posted if str(platform).strip()]
+        platforms_list = []
+        for platform in platforms_posted:
+            normalized_platform = _normalize_text(platform, 64)
+            if normalized_platform:
+                platforms_list.append(normalized_platform)
     else:
-        platforms_list = [str(platforms_posted).strip()] if str(platforms_posted).strip() else []
+        one_platform = _normalize_text(platforms_posted, 64)
+        platforms_list = [one_platform] if one_platform else []
 
     primary_platform = platforms_list[0] if platforms_list else "unknown"
     platforms_json = json.dumps(platforms_list)
@@ -106,6 +137,10 @@ def publish_video(author, title, date_published, description, platforms_posted, 
 
 
 def get_videos_by_username(username):
+    username = _normalize_text(username, 255)
+    if not username:
+        return []
+
     conn = sqlite3.connect('videos.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -164,6 +199,11 @@ def get_videos_by_username(username):
 
 
 def login(username, password):
+    username = _normalize_text(username, 255)
+    password = _normalize_text(password, 255)
+    if not username or not password:
+        return False
+
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
     cursor.execute('''
@@ -178,6 +218,12 @@ def login(username, password):
 
 
 def signup(username, password, gmail=None):
+    username = _normalize_text(username, 255)
+    password = _normalize_text(password, 255)
+    gmail = _normalize_optional_text(gmail, 255)
+    if not username or not password:
+        return
+
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
     cursor.execute('''
@@ -188,6 +234,10 @@ def signup(username, password, gmail=None):
 
 
 def check_username_exists(username):
+    username = _normalize_text(username, 255)
+    if not username:
+        return False
+
     conn = sqlite3.connect('user_data.db')
     cursor = conn.cursor()
     cursor.execute('''
@@ -199,6 +249,32 @@ def check_username_exists(username):
         return True
     else:
         return False
+
+
+def update_auth_tokens(username, auth_tokens):
+    username = _normalize_text(username, 255)
+    if not username:
+        return False
+
+    if isinstance(auth_tokens, dict):
+        auth_tokens_value = json.dumps(auth_tokens)
+    else:
+        auth_tokens_value = str(auth_tokens or "")
+    if "\x00" in auth_tokens_value:
+        return False
+    auth_tokens_value = auth_tokens_value[:50000]
+
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE users
+        SET auth_tokens = ?
+        WHERE username = ?
+    ''', (auth_tokens_value, username))
+    conn.commit()
+    rows_updated = cursor.rowcount
+    conn.close()
+    return rows_updated > 0
 
 
 create_database()

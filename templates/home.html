@@ -14,6 +14,7 @@
             <button type="button" id="postsNavButton" class="nav-item nav-item-active">Posts</button>
             <button type="button" id="analyticsNavButton" class="nav-item">Analytics</button>
             <button type="button" id="paymentsNavButton" class="nav-item">Payments</button>
+            <button type="button" id="linkAccountNavButton" class="nav-item">Link Account</button>
         </nav>
     </aside>
 
@@ -161,6 +162,11 @@
                         </ul>
                     </article>
                 </div>
+            </section>
+        </section>
+        <section id="linkAccountSection" class="is-hidden">
+            <section class="panel">
+                <h2>Link Account</h2>
             </section>
         </section>
     </main>
@@ -343,9 +349,11 @@
     const postsNavButton = document.getElementById("postsNavButton");
     const analyticsNavButton = document.getElementById("analyticsNavButton");
     const paymentsNavButton = document.getElementById("paymentsNavButton");
+    const linkAccountNavButton = document.getElementById("linkAccountNavButton");
     const postsSection = document.getElementById("postsSection");
     const analyticsSection = document.getElementById("analyticsSection");
     const paymentsSection = document.getElementById("paymentsSection");
+    const linkAccountSection = document.getElementById("linkAccountSection");
 
     const tierFree = document.getElementById("tierFree");
     const tierPaid = document.getElementById("tierPaid");
@@ -401,27 +409,44 @@
         postsSection.classList.remove("is-hidden");
         analyticsSection.classList.add("is-hidden");
         paymentsSection.classList.add("is-hidden");
+        linkAccountSection.classList.add("is-hidden");
         postsNavButton.classList.add("nav-item-active");
         analyticsNavButton.classList.remove("nav-item-active");
         paymentsNavButton.classList.remove("nav-item-active");
+        linkAccountNavButton.classList.remove("nav-item-active");
     }
 
     function showAnalyticsSection() {
         postsSection.classList.add("is-hidden");
         analyticsSection.classList.remove("is-hidden");
         paymentsSection.classList.add("is-hidden");
+        linkAccountSection.classList.add("is-hidden");
         postsNavButton.classList.remove("nav-item-active");
         analyticsNavButton.classList.add("nav-item-active");
         paymentsNavButton.classList.remove("nav-item-active");
+        linkAccountNavButton.classList.remove("nav-item-active");
     }
 
     function showPaymentsSection() {
         postsSection.classList.add("is-hidden");
         analyticsSection.classList.add("is-hidden");
         paymentsSection.classList.remove("is-hidden");
+        linkAccountSection.classList.add("is-hidden");
         postsNavButton.classList.remove("nav-item-active");
         analyticsNavButton.classList.remove("nav-item-active");
         paymentsNavButton.classList.add("nav-item-active");
+        linkAccountNavButton.classList.remove("nav-item-active");
+    }
+
+    function showLinkAccountSection() {
+        postsSection.classList.add("is-hidden");
+        analyticsSection.classList.add("is-hidden");
+        paymentsSection.classList.add("is-hidden");
+        linkAccountSection.classList.remove("is-hidden");
+        postsNavButton.classList.remove("nav-item-active");
+        analyticsNavButton.classList.remove("nav-item-active");
+        paymentsNavButton.classList.remove("nav-item-active");
+        linkAccountNavButton.classList.add("nav-item-active");
     }
 
     function updateTierSelection() {
@@ -436,6 +461,7 @@
     postsNavButton.addEventListener("click", showPostsSection);
     analyticsNavButton.addEventListener("click", showAnalyticsSection);
     paymentsNavButton.addEventListener("click", showPaymentsSection);
+    linkAccountNavButton.addEventListener("click", showLinkAccountSection);
     publishVideoButton.addEventListener("click", openPublishModal);
     closePublishModalButton.addEventListener("click", closePublishModal);
     cancelPublishModalButton.addEventListener("click", closePublishModal);
