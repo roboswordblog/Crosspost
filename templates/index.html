@@ -148,7 +148,11 @@
         document.getElementById("loginHomeButton").disabled = true;
     }
 
-    function goToHomeRoute() {
+    function goToHomeRoute(username) {
+        if (username && username.trim()) {
+            window.location.href = "/home?username=" + encodeURIComponent(username.trim());
+            return;
+        }
         window.location.href = "/home";
     }
 
@@ -265,7 +269,7 @@
             document.getElementById("signupSuccess").textContent = data.message || "Signup successful.";
             document.getElementById("signupHomeButton").disabled = false;
             document.getElementById("signupForm").reset();
-            goToHomeRoute();
+            goToHomeRoute(username);
         } catch (error) {
             document.getElementById("signupError").textContent = "Could not reach the server.";
         }
@@ -294,7 +298,7 @@
 
             document.getElementById("loginSuccess").textContent = data.message || "Login successful.";
             document.getElementById("loginHomeButton").disabled = false;
-            goToHomeRoute();
+            goToHomeRoute(username);
         } catch (error) {
             document.getElementById("loginError").textContent = "Could not reach the server.";
         }

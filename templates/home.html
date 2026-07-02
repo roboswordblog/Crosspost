@@ -22,18 +22,24 @@
             <header class="topbar">
                 <div>
                     <p class="eyebrow">Dashboard</p>
-                    <h1>What will you post today?</h1>
+                    <h1>
+                        {% if home_data.username %}
+                            {{ home_data.username }}, what will you post today?
+                        {% else %}
+                            What will you post today?
+                        {% endif %}
+                    </h1>
                 </div>
                 <button type="button" class="btn btn-primary">Publish New Video</button>
             </header>
             <section class="metrics-grid">
                 <article class="metric-card">
                     <p class="metric-label">Posts This Week</p>
-                    <strong>12</strong>
+                    <strong>{{ home_data.metrics.posts_this_week }}</strong>
                 </article>
                 <article class="metric-card">
                     <p class="metric-label">Posts All Time</p>
-                    <strong>184</strong>
+                    <strong>{{ home_data.metrics.posts_all_time }}</strong>
                 </article>
 
             </section>
@@ -44,6 +50,25 @@
                     <input id="search" type="search" placeholder="Search your recent publishing" aria-label="Search recent posts">
                 </div>
                 <ul class="recent-list">
+                    {% for video in home_data.recent_posts %}
+                        <li>
+                            <span class="post-title">{{ video.title }}</span>
+                            <span class="post-meta">
+                                {% if video.platforms_posted %}
+                                    {{ video.platforms_posted | join(', ') }}
+                                {% else %}
+                                    {{ video.platform }}
+                                {% endif %}
+                            </span>
+                            <span class="status status-{{ video.status|lower }}">{{ video.status|capitalize }}</span>
+                        </li>
+                    {% else %}
+                        <li class="empty-state-item">
+                            <span class="post-title">No videos published yet.</span>
+                            <span class="post-meta">Start by publishing your first video.</span>
+                            <span class="status status-draft">Draft</span>
+                        </li>
+                    {% endfor %}
                 </ul>
             </section>
         </section>
@@ -56,21 +81,21 @@
                 <article class="latest-video">
                     <div>
                         <p class="metric-label">Video</p>
-                        <h3>Founder Q&A Clip</h3>
-                        <p class="analytics-subtitle">Published on YouTube and TikTok</p>
+                        <h3>{{ home_data.newest_video.title }}</h3>
+                        <p class="analytics-subtitle">Published on {{ home_data.newest_video.platforms_text }}</p>
                     </div>
                     <div class="latest-metrics">
                         <article class="metric-card">
                             <p class="metric-label">Views</p>
-                            <strong>24.8K</strong>
+                            <strong>{{ home_data.newest_video.views }}</strong>
                         </article>
                         <article class="metric-card">
                             <p class="metric-label">Engagement Rate</p>
-                            <strong>8.3%</strong>
+                            <strong>{{ home_data.newest_video.engagement_rate }}%</strong>
                         </article>
                         <article class="metric-card">
-                            <p class="metric-label">Watch Time</p>
-                            <strong>39.4h</strong>
+                            <p class="metric-label">Likes</p>
+                            <strong>{{ home_data.newest_video.likes }}</strong>
                         </article>
                     </div>
                 </article>
@@ -82,30 +107,20 @@
                     <span class="panel-chip">Last 30 Days</span>
                 </div>
                 <div class="platform-grid">
-                    <article class="platform-card">
-                        <h3>YouTube</h3>
-                        <p class="analytics-subtitle">12 videos published</p>
-                        <ul class="platform-stats">
-                            <li><span>Total Views</span><strong>148K</strong></li>
-                            <li><span>Avg. Engagement</span><strong>7.9%</strong></li>
-                            <li><span>Subscribers Gained</span><strong>+840</strong></li>
-                        </ul>
-                        <div class="progress-track" aria-label="YouTube growth score">
-                            <div class="progress-fill progress-youtube"></div>
-                        </div>
-                    </article>
-                    <article class="platform-card">
-                        <h3>TikTok</h3>
-                        <p class="analytics-subtitle">16 videos published</p>
-                        <ul class="platform-stats">
-                            <li><span>Total Views</span><strong>221K</strong></li>
-                            <li><span>Avg. Engagement</span><strong>10.6%</strong></li>
-                            <li><span>Followers Gained</span><strong>+1,420</strong></li>
-                        </ul>
-                        <div class="progress-track" aria-label="TikTok growth score">
-                            <div class="progress-fill progress-tiktok"></div>
-                        </div>
-                    </article>
+                    {% for platform in home_data.platform_analytics %}
+                        <article class="platform-card">
+                            <h3>{{ platform.name }}</h3>
+                            <p class="analytics-subtitle">{{ platform.videos_published }} videos published</p>
+                            <ul class="platform-stats">
+                                <li><span>Total Views</span><strong>{{ platform.total_views }}</strong></li>
+                                <li><span>Avg. Engagement</span><strong>{{ platform.engagement_rate }}%</strong></li>
+                                <li><span>Total Likes</span><strong>{{ platform.total_likes }}</strong></li>
+                            </ul>
+                            <div class="progress-track" aria-label="{{ platform.name }} growth score">
+                                <div class="progress-fill" style="width: {{ platform.growth_score }}%;"></div>
+                            </div>
+                        </article>
+                    {% endfor %}
                 </div>
             </section>
         </section>
