@@ -172,31 +172,119 @@
             <button type="button" id="closePublishModalButton" class="btn btn-secondary modal-close">Close</button>
         </div>
         <div class="modal-body">
-            <div class="upload-row">
-                <input id="videoFileInput" type="file" accept="video/*" class="is-hidden">
-                <button type="button" id="videoUploadButton" class="btn btn-primary">Upload Video</button>
-                <span id="videoFileName" class="upload-filename">No file selected</span>
+            <div id="publishStep1" class="modal-step">
+                <h3>Step 1: Upload & Platforms</h3>
+                <div class="upload-row">
+                    <input id="videoFileInput" type="file" accept="video/*" class="is-hidden">
+                    <button type="button" id="videoUploadButton" class="btn btn-primary">Upload Video</button>
+                    <span id="videoFileName" class="upload-filename">No file selected</span>
+                </div>
+                <div class="platform-sliders">
+                    <label class="platform-toggle" for="publishYoutube">
+                        <span>YouTube</span>
+                        <span class="switch">
+                            <input id="publishYoutube" type="checkbox" checked>
+                            <span class="switch-slider"></span>
+                        </span>
+                    </label>
+                    <label class="platform-toggle" for="publishTiktok">
+                        <span>TikTok</span>
+                        <span class="switch">
+                            <input id="publishTiktok" type="checkbox" checked>
+                            <span class="switch-slider"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelPublishModalButton" class="btn btn-secondary">Cancel</button>
+                    <button type="button" class="btn btn-primary modal-continue-button" data-next-step="2">Continue</button>
+                </div>
             </div>
-            <div class="platform-sliders">
-                <label class="platform-toggle" for="publishYoutube">
-                    <span>YouTube</span>
-                    <span class="switch">
-                        <input id="publishYoutube" type="checkbox" checked>
-                        <span class="switch-slider"></span>
-                    </span>
-                </label>
-                <label class="platform-toggle" for="publishTiktok">
-                    <span>TikTok</span>
-                    <span class="switch">
-                        <input id="publishTiktok" type="checkbox" checked>
-                        <span class="switch-slider"></span>
-                    </span>
-                </label>
+
+            <div id="publishStep2" class="modal-step is-hidden">
+                <h3>Step 2: Video Details</h3>
+                <div class="platform-editor-tabs" role="tablist" aria-label="Platform editor">
+                    <button type="button" id="editorYoutubeTab" class="platform-editor-tab platform-editor-tab-active" data-editor-platform="youtube">YouTube</button>
+                    <button type="button" id="editorTiktokTab" class="platform-editor-tab" data-editor-platform="tiktok">TikTok</button>
+                </div>
+
+                <div id="editorYoutubePanel" class="platform-editor-panel">
+                    <div class="modal-fields">
+                        <label for="publishYoutubeTitle">YouTube Title</label>
+                        <input id="publishYoutubeTitle" type="text" placeholder="Enter YouTube title">
+                    </div>
+                    <div class="upload-row">
+                        <input id="youtubeThumbnailInput" type="file" accept="image/*" class="is-hidden">
+                        <button type="button" id="youtubeThumbnailButton" class="btn btn-secondary">Upload YouTube Thumbnail</button>
+                        <span id="youtubeThumbnailName" class="upload-filename">No thumbnail selected</span>
+                    </div>
+                </div>
+
+                <div id="editorTiktokPanel" class="platform-editor-panel is-hidden">
+                    <div class="modal-fields">
+                        <label for="publishTiktokTitle">TikTok Title</label>
+                        <input id="publishTiktokTitle" type="text" placeholder="Enter TikTok title">
+                    </div>
+                    <div class="upload-row">
+                        <input id="tiktokThumbnailInput" type="file" accept="image/*" class="is-hidden">
+                        <button type="button" id="tiktokThumbnailButton" class="btn btn-secondary">Upload TikTok Thumbnail</button>
+                        <span id="tiktokThumbnailName" class="upload-filename">No thumbnail selected</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-back-button" data-prev-step="1">Back</button>
+                    <button type="button" class="btn btn-primary modal-continue-button" data-next-step="3">Continue</button>
+                </div>
             </div>
-        </div>
-        <div class="modal-actions">
-            <button type="button" id="cancelPublishModalButton" class="btn btn-secondary">Cancel</button>
-            <button type="button" class="btn btn-primary">Continue</button>
+
+            <div id="publishStep3" class="modal-step is-hidden">
+                <h3>Step 3: Publish Timing</h3>
+                <div class="modal-fields">
+                    <label for="publishDate">Publish Date</label>
+                    <input id="publishDate" type="date">
+                    <label for="publishTime">Publish Time</label>
+                    <input id="publishTime" type="time">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-back-button" data-prev-step="2">Back</button>
+                    <button type="button" class="btn btn-primary modal-continue-button" data-next-step="4">Continue</button>
+                </div>
+            </div>
+
+            <div id="publishStep4" class="modal-step is-hidden">
+                <h3>Step 4: Settings</h3>
+                <div class="platform-sliders">
+                    <label class="platform-toggle" for="notifyFollowers">
+                        <span>Notify Followers</span>
+                        <span class="switch">
+                            <input id="notifyFollowers" type="checkbox" checked>
+                            <span class="switch-slider"></span>
+                        </span>
+                    </label>
+                    <label class="platform-toggle" for="allowComments">
+                        <span>Allow Comments</span>
+                        <span class="switch">
+                            <input id="allowComments" type="checkbox" checked>
+                            <span class="switch-slider"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-back-button" data-prev-step="3">Back</button>
+                    <button type="button" class="btn btn-primary modal-continue-button" data-next-step="5">Continue</button>
+                </div>
+            </div>
+
+            <div id="publishStep5" class="modal-step is-hidden">
+                <h3>Step 5: Final Review</h3>
+                <div class="review-empty">
+                    Review your thumbnails here
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-back-button" data-prev-step="4">Back</button>
+                    <button type="button" class="btn btn-primary modal-continue-button" data-next-step="done">Continue</button>
+                </div>
+            </div>
         </div>
     </section>
 </div>
@@ -206,9 +294,19 @@
     const publishModalOverlay = document.getElementById("publishModalOverlay");
     const closePublishModalButton = document.getElementById("closePublishModalButton");
     const cancelPublishModalButton = document.getElementById("cancelPublishModalButton");
+    const modalContinueButtons = document.querySelectorAll(".modal-continue-button");
+    const modalBackButtons = document.querySelectorAll(".modal-back-button");
+    const modalSteps = document.querySelectorAll(".modal-step");
     const videoFileInput = document.getElementById("videoFileInput");
     const videoUploadButton = document.getElementById("videoUploadButton");
     const videoFileName = document.getElementById("videoFileName");
+    const editorTabs = document.querySelectorAll(".platform-editor-tab");
+    const youtubeThumbnailInput = document.getElementById("youtubeThumbnailInput");
+    const youtubeThumbnailButton = document.getElementById("youtubeThumbnailButton");
+    const youtubeThumbnailName = document.getElementById("youtubeThumbnailName");
+    const tiktokThumbnailInput = document.getElementById("tiktokThumbnailInput");
+    const tiktokThumbnailButton = document.getElementById("tiktokThumbnailButton");
+    const tiktokThumbnailName = document.getElementById("tiktokThumbnailName");
 
     const postsNavButton = document.getElementById("postsNavButton");
     const analyticsNavButton = document.getElementById("analyticsNavButton");
@@ -221,7 +319,26 @@
     const tierPaid = document.getElementById("tierPaid");
     const tierOptions = document.querySelectorAll(".tier-option");
 
+    function showEditorPlatform(platform) {
+        document.getElementById("editorYoutubePanel").classList.toggle("is-hidden", platform !== "youtube");
+        document.getElementById("editorTiktokPanel").classList.toggle("is-hidden", platform !== "tiktok");
+        editorTabs.forEach(function (tab) {
+            tab.classList.toggle("platform-editor-tab-active", tab.dataset.editorPlatform === platform);
+        });
+    }
+
+    function showPublishStep(stepNumber) {
+        modalSteps.forEach(function (stepElement) {
+            stepElement.classList.add("is-hidden");
+        });
+        const activeStep = document.getElementById("publishStep" + stepNumber);
+        if (activeStep) {
+            activeStep.classList.remove("is-hidden");
+        }
+    }
+
     function openPublishModal() {
+        showPublishStep(1);
         publishModalOverlay.classList.remove("is-hidden");
         appShell.classList.add("is-blurred");
         document.body.classList.add("modal-open");
@@ -277,6 +394,22 @@
     publishVideoButton.addEventListener("click", openPublishModal);
     closePublishModalButton.addEventListener("click", closePublishModal);
     cancelPublishModalButton.addEventListener("click", closePublishModal);
+    modalContinueButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const nextStep = button.dataset.nextStep;
+            if (nextStep === "done") {
+                closePublishModal();
+                return;
+            }
+            showPublishStep(nextStep);
+        });
+    });
+    modalBackButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const previousStep = button.dataset.prevStep;
+            showPublishStep(previousStep);
+        });
+    });
     videoUploadButton.addEventListener("click", function () {
         videoFileInput.click();
     });
@@ -285,6 +418,31 @@
             videoFileName.textContent = videoFileInput.files[0].name;
         } else {
             videoFileName.textContent = "No file selected";
+        }
+    });
+    editorTabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+            showEditorPlatform(tab.dataset.editorPlatform);
+        });
+    });
+    youtubeThumbnailButton.addEventListener("click", function () {
+        youtubeThumbnailInput.click();
+    });
+    youtubeThumbnailInput.addEventListener("change", function () {
+        if (youtubeThumbnailInput.files && youtubeThumbnailInput.files.length > 0) {
+            youtubeThumbnailName.textContent = youtubeThumbnailInput.files[0].name;
+        } else {
+            youtubeThumbnailName.textContent = "No thumbnail selected";
+        }
+    });
+    tiktokThumbnailButton.addEventListener("click", function () {
+        tiktokThumbnailInput.click();
+    });
+    tiktokThumbnailInput.addEventListener("change", function () {
+        if (tiktokThumbnailInput.files && tiktokThumbnailInput.files.length > 0) {
+            tiktokThumbnailName.textContent = tiktokThumbnailInput.files[0].name;
+        } else {
+            tiktokThumbnailName.textContent = "No thumbnail selected";
         }
     });
     publishModalOverlay.addEventListener("click", function (event) {
@@ -299,6 +457,7 @@
     });
     tierFree.addEventListener("change", updateTierSelection);
     tierPaid.addEventListener("change", updateTierSelection);
+    showEditorPlatform("youtube");
     showPostsSection();
     updateTierSelection();
 </script>
