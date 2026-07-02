@@ -282,6 +282,28 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-back-button" data-prev-step="4">Back</button>
+                    <button type="button" class="btn btn-primary modal-continue-button" data-next-step="6">Continue</button>
+                </div>
+            </div>
+
+            <div id="publishStep6" class="modal-step is-hidden">
+                <h3>Step 6: Review Your Videos</h3>
+                <div class="review-grid">
+                    <article class="review-card">
+                        <h4>YouTube</h4>
+                        <p><strong>Title:</strong> <span id="reviewYoutubeTitle">Not set</span></p>
+                        <p><strong>Thumbnail:</strong> <span id="reviewYoutubeThumb">Not selected</span></p>
+                        <p><strong>Status:</strong> <span id="reviewYoutubeStatus">Selected</span></p>
+                    </article>
+                    <article class="review-card">
+                        <h4>TikTok</h4>
+                        <p><strong>Title:</strong> <span id="reviewTiktokTitle">Not set</span></p>
+                        <p><strong>Thumbnail:</strong> <span id="reviewTiktokThumb">Not selected</span></p>
+                        <p><strong>Status:</strong> <span id="reviewTiktokStatus">Selected</span></p>
+                    </article>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-back-button" data-prev-step="5">Back</button>
                     <button type="button" class="btn btn-primary modal-continue-button" data-next-step="done">Continue</button>
                 </div>
             </div>
@@ -307,6 +329,16 @@
     const tiktokThumbnailInput = document.getElementById("tiktokThumbnailInput");
     const tiktokThumbnailButton = document.getElementById("tiktokThumbnailButton");
     const tiktokThumbnailName = document.getElementById("tiktokThumbnailName");
+    const publishYoutube = document.getElementById("publishYoutube");
+    const publishTiktok = document.getElementById("publishTiktok");
+    const publishYoutubeTitle = document.getElementById("publishYoutubeTitle");
+    const publishTiktokTitle = document.getElementById("publishTiktokTitle");
+    const reviewYoutubeTitle = document.getElementById("reviewYoutubeTitle");
+    const reviewYoutubeThumb = document.getElementById("reviewYoutubeThumb");
+    const reviewYoutubeStatus = document.getElementById("reviewYoutubeStatus");
+    const reviewTiktokTitle = document.getElementById("reviewTiktokTitle");
+    const reviewTiktokThumb = document.getElementById("reviewTiktokThumb");
+    const reviewTiktokStatus = document.getElementById("reviewTiktokStatus");
 
     const postsNavButton = document.getElementById("postsNavButton");
     const analyticsNavButton = document.getElementById("analyticsNavButton");
@@ -318,6 +350,16 @@
     const tierFree = document.getElementById("tierFree");
     const tierPaid = document.getElementById("tierPaid");
     const tierOptions = document.querySelectorAll(".tier-option");
+
+    function updateFinalReview() {
+        reviewYoutubeTitle.textContent = publishYoutubeTitle.value.trim() || "Not set";
+        reviewYoutubeThumb.textContent = youtubeThumbnailName.textContent || "Not selected";
+        reviewYoutubeStatus.textContent = publishYoutube.checked ? "Selected" : "Not selected";
+
+        reviewTiktokTitle.textContent = publishTiktokTitle.value.trim() || "Not set";
+        reviewTiktokThumb.textContent = tiktokThumbnailName.textContent || "Not selected";
+        reviewTiktokStatus.textContent = publishTiktok.checked ? "Selected" : "Not selected";
+    }
 
     function showEditorPlatform(platform) {
         document.getElementById("editorYoutubePanel").classList.toggle("is-hidden", platform !== "youtube");
@@ -334,6 +376,9 @@
         const activeStep = document.getElementById("publishStep" + stepNumber);
         if (activeStep) {
             activeStep.classList.remove("is-hidden");
+        }
+        if (String(stepNumber) === "6") {
+            updateFinalReview();
         }
     }
 

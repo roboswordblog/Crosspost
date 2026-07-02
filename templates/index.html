@@ -149,11 +149,18 @@
     }
 
     function goToHomeRoute(username) {
-        if (username && username.trim()) {
-            window.location.href = "/home?username=" + encodeURIComponent(username.trim());
-            return;
-        }
-        window.location.href = "/home";
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/home";
+
+        const usernameInput = document.createElement("input");
+        usernameInput.type = "hidden";
+        usernameInput.name = "username";
+        usernameInput.value = username ? username.trim() : "";
+        form.appendChild(usernameInput);
+
+        document.body.appendChild(form);
+        form.submit();
     }
 
     async function pollUsernameExists() {

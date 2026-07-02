@@ -124,12 +124,9 @@ def signup_route():
     db_signup(username, password)
     return jsonify({"ok": True, "message": "Signup complete."})
 
-@app.route("/home", methods=["POST", "GET"])
+@app.route("/home", methods=["POST"])
 def home():
-    username = (
-        request.args.get("username", "").strip()
-        or request.form.get("username", "").strip()
-    )
+    username = request.form.get("username", "").strip()
     videos = get_videos_by_username(username) if username else []
     home_data = _build_home_data(username, videos)
     return render_template("home.html", home_data=home_data)

@@ -518,6 +518,31 @@ h3 {
     background: #f9fafb;
 }
 
+.review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.review-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 12px;
+}
+
+.review-card h4 {
+    margin: 0 0 8px;
+    color: #0f172a;
+    font-size: 0.95rem;
+}
+
+.review-card p {
+    margin: 0 0 6px;
+    color: #374151;
+    font-size: 0.88rem;
+}
+
 .is-hidden {
     display: none !important;
 }
@@ -646,7 +671,8 @@ h3 {
     }
 
     .latest-metrics,
-    .platform-grid {
+    .platform-grid,
+    .review-grid {
         grid-template-columns: 1fr;
     }
 
