@@ -1,13 +1,45 @@
-from flask import Flask, render_template, request, jsonify
+import os
+import html
+import json
+
+from flask import Flask, render_template, request, jsonify, redirect, session
+from google_auth_oauthlib.flow import Flow
 from datetime import datetime, timedelta
 from datamanagement import (
     login as db_login,
     signup as db_signup,
     check_username_exists,
     get_videos_by_username,
+    get_auth_tokens,
+    update_auth_tokens,
 )
+from publishing import publish_to_youtube
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-only-secret-change-me")
+
+YOUTUBE_CLIENT_SECRETS_FILE = os.path.join(
+    os.path.dirname(__file__),
+    "oath",
+    "creds",
+    "client_secret_778206428456-7fb0qkmibu7applvmih8hs521toaem5h.apps.googleusercontent.com.json",
+)
+YOUTUBE_OAUTH_SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+
+
+def _load_youtube_oauth_client_config():
+    with open(YOUTUBE_CLIENT_SECRETS_FILE, "r", encoding="utf-8") as f:
+        client_config = json.load(f)
+    web_config = client_config.get("web") or {}
+    redirect_uris = web_config.get("redirect_uris") or []
+    return {
+        "client_id": web_config.get("client_id", ""),
+        "redirect_uri": redirect_uris[0] if redirect_uris else "",
+    }
+
+
+YOUTUBE_OAUTH_CLIENT_CONFIG = _load_youtube_oauth_client_config()
+YOUTUBE_REDIRECT_URI = YOUTUBE_OAUTH_CLIENT_CONFIG["redirect_uri"]
 
 
 def _parse_date(value):
@@ -20,7 +52,7 @@ def _parse_date(value):
         return None
 
 
-def _build_home_data(username, videos):
+def _build_home_data(username, videos, youtube_connected=False):
     videos_count = len(videos)
     today = datetime.utcnow().date()
     week_start = today - timedelta(days=6)
@@ -70,6 +102,7 @@ def _build_home_data(username, videos):
 
     return {
         "username": username,
+        "youtube_connected": youtube_connected,
         "recent_posts": videos[:20],
         "metrics": {
             "posts_this_week": posts_this_week,
@@ -87,6 +120,35 @@ def _build_home_data(username, videos):
     }
 
 
+def _credentials_to_dict(credentials):
+    return {
+        "token": credentials.token,
+        "refresh_token": credentials.refresh_token,
+        "token_uri": credentials.token_uri,
+        "client_id": credentials.client_id,
+        "client_secret": credentials.client_secret,
+        "scopes": credentials.scopes,
+    }
+
+
+def _home_post_redirect_response(username):
+    safe_username = html.escape(username or "", quote=True)
+    html = f"""
+<!DOCTYPE html>
+<html lang="en">
+<body>
+  <form id="homeRedirectForm" method="POST" action="/home">
+    <input type="hidden" name="username" value="{safe_username}">
+  </form>
+  <script>
+    document.getElementById('homeRedirectForm').submit();
+  </script>
+</body>
+</html>
+"""
+    return html
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -98,6 +160,7 @@ def login_route():
     password = request.form["password"]
     user = db_login(username, password)
     if user:
+        session["username"] = username.strip()
         return jsonify({"ok": True, "message": "Login successful."})
     return jsonify({"ok": False, "error": "Invalid username or password."}), 401
 
@@ -122,14 +185,119 @@ def signup_route():
         return jsonify({"ok": False, "error": "That username already exists."}), 409
 
     db_signup(username, password)
+    session["username"] = username
     return jsonify({"ok": True, "message": "Signup complete."})
 
 @app.route("/home", methods=["POST"])
 def home():
-    username = request.form.get("username", "").strip()
+    username = request.form.get("username", "").strip() or session.get("username", "").strip()
+    if username:
+        session["username"] = username
     videos = get_videos_by_username(username) if username else []
-    home_data = _build_home_data(username, videos)
+    tokens = get_auth_tokens(username) if username else {}
+    youtube_connected = bool(tokens and isinstance(tokens, dict) and tokens.get("youtube"))
+    home_data = _build_home_data(username, videos, youtube_connected=youtube_connected)
     return render_template("home.html", home_data=home_data)
+
+
+@app.route("/auth/youtube/start", methods=["POST", "GET"])
+def youtube_auth_start():
+    username = (
+        request.form.get("username", "").strip()
+        or request.args.get("username", "").strip()
+        or session.get("username", "").strip()
+    )
+    if not username:
+        return jsonify({"ok": False, "error": "No active user in session."}), 400
+
+    if not os.path.exists(YOUTUBE_CLIENT_SECRETS_FILE):
+        return jsonify({"ok": False, "error": "YouTube OAuth client secret file not found."}), 500
+    if not YOUTUBE_REDIRECT_URI:
+        return jsonify({"ok": False, "error": "No redirect URI found in OAuth client secret JSON."}), 500
+
+    flow = Flow.from_client_secrets_file(
+        YOUTUBE_CLIENT_SECRETS_FILE,
+        scopes=YOUTUBE_OAUTH_SCOPES,
+        redirect_uri=YOUTUBE_REDIRECT_URI,
+    )
+    authorization_url, state = flow.authorization_url(
+        access_type="offline",
+        include_granted_scopes="true",
+        prompt="consent",
+    )
+    session["youtube_oauth_state"] = state
+    session["oauth_username"] = username
+    return redirect(authorization_url)
+
+
+@app.route("/auth/youtube/callback", methods=["GET"])
+def youtube_auth_callback():
+    state = request.args.get("state", "")
+    stored_state = session.get("youtube_oauth_state", "")
+    if not state or state != stored_state:
+        return jsonify({"ok": False, "error": "OAuth state validation failed."}), 400
+
+    flow = Flow.from_client_secrets_file(
+        YOUTUBE_CLIENT_SECRETS_FILE,
+        scopes=YOUTUBE_OAUTH_SCOPES,
+        state=stored_state,
+        redirect_uri=YOUTUBE_REDIRECT_URI,
+    )
+    flow.fetch_token(authorization_response=request.url)
+    username = session.get("oauth_username", "").strip() or session.get("username", "").strip()
+    if not username:
+        return jsonify({"ok": False, "error": "Unable to map OAuth callback to a user."}), 400
+
+    existing_tokens = get_auth_tokens(username) or {}
+    if not isinstance(existing_tokens, dict):
+        existing_tokens = {}
+    existing_tokens["youtube"] = _credentials_to_dict(flow.credentials)
+
+    if not update_auth_tokens(username, existing_tokens):
+        return jsonify({"ok": False, "error": "Could not save OAuth tokens for this user."}), 500
+
+    session["username"] = username
+    return _home_post_redirect_response(username)
+
+
+@app.route("/publish/youtube", methods=["POST"])
+def youtube_publish_route():
+    username = request.form.get("username", "").strip() or session.get("username", "").strip()
+    if not username:
+        return jsonify({"ok": False, "error": "No active user in session."}), 400
+
+    video_path = request.form.get("video_path", "").strip()
+    title = request.form.get("title", "").strip()
+    description = request.form.get("description", "").strip()
+    privacy_status = request.form.get("privacy_status", "private").strip() or "private"
+    raw_tags = request.form.get("tags", "").strip()
+    tags = [tag.strip() for tag in raw_tags.split(",") if tag.strip()]
+
+    try:
+        response = publish_to_youtube(
+            username=username,
+            video_path=video_path,
+            title=title,
+            description=description,
+            tags=tags,
+            privacy_status=privacy_status,
+        )
+        return jsonify({
+            "ok": True,
+            "message": "Video published to YouTube.",
+            "youtube_video_id": response.get("id"),
+        })
+    except Exception as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+
+@app.route("/auth/youtube/debug", methods=["GET"])
+def youtube_auth_debug():
+    return jsonify({
+        "client_id": YOUTUBE_OAUTH_CLIENT_CONFIG.get("client_id"),
+        "redirect_uri_in_use": YOUTUBE_REDIRECT_URI,
+        "client_secrets_file": YOUTUBE_CLIENT_SECRETS_FILE,
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)

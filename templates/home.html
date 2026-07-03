@@ -167,6 +167,16 @@
         <section id="linkAccountSection" class="is-hidden">
             <section class="panel">
                 <h2>Link Account</h2>
+                <p class="link-account-subtitle">Connect YouTube first, then you can publish through the app.</p>
+                <div class="link-account-row">
+                    <span class="status {{ 'status-live' if home_data.youtube_connected else 'status-draft' }}">
+                        {{ 'YouTube Connected' if home_data.youtube_connected else 'YouTube Not Connected' }}
+                    </span>
+                    <form method="POST" action="/auth/youtube/start">
+                        <input type="hidden" name="username" value="{{ home_data.username }}">
+                        <button type="submit" class="btn btn-primary">Link YouTube Account</button>
+                    </form>
+                </div>
             </section>
         </section>
     </main>

@@ -556,6 +556,19 @@ h3 {
     color: #4b5563;
 }
 
+.link-account-subtitle {
+    margin: 8px 0 14px;
+    color: #4b5563;
+}
+
+.link-account-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 .tier-controls {
     display: flex;
     flex-wrap: wrap;

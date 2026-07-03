@@ -277,5 +277,31 @@ def update_auth_tokens(username, auth_tokens):
     return rows_updated > 0
 
 
+def get_auth_tokens(username):
+    username = _normalize_text(username, 255)
+    if not username:
+        return None
+
+    conn = sqlite3.connect('user_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT auth_tokens FROM users WHERE username = ?
+    ''', (username,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row or not row[0]:
+        return None
+
+    raw_tokens = row[0]
+    try:
+        parsed = json.loads(raw_tokens)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        return {"raw": raw_tokens}
+    return None
+
+
 create_database()
 create_videos_database()
